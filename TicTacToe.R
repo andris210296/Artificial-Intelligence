@@ -12,20 +12,26 @@ modelottt <- ReinforcementLearning(tictactoe, s = "State", a = "Action", r = "Re
 checkVictory= function(board)
 {
   #diagonal1
-  if(board[1,1] == board[2,2] && board[1,1] == board[3,3]){
-    warning("diagonal1")
-    return (board[1,1]);
+  if(board[1,1] == board[2,2] && board[1,1] == board[3,3] &&
+     board[1,1] != "" && board[2,2] != "" && board[3,3] != ""){
+
+      warning("diagonal1")
+      return (board[1,1]);
+    
   }
   
   #diagonal2
-  if(board[1,3] == board[2,2] && board[1,3] == board[3,1]){
-    warning("diagonal2")
-    return (board[1,1]);
+  if(board[1,3] == board[2,2] && board[1,3] == board[3,1] &&
+     board[1,3] != "" && board[2,2] != "" && board[3,1] != ""){
+      warning("diagonal2")
+      return (board[1,1]);
+
   }
   
   #Vertical
   for (i in 1:3) {
-    if(board[1,i] == board[2,i] && board[1,i] == board[3,i]){
+    if(board[1,i] == board[2,i] && board[1,i] == board[3,i] &&
+       board[1,i] != "" && board[2,i] != "" && board[3,i] != ""){
       warning("Vertical")
       return (board[i,1]);
     }
@@ -33,11 +39,14 @@ checkVictory= function(board)
   
   #Horizontal
   for (i in 1:3) {
-    if(board[i,1] == board[i,2] && board[i,1] == board[i,3]){
+    if(board[i,1] == board[i,2] && board[i,1] == board[i,3] &&
+       board[i,1] != "" && board[i,2] != "" && board[i,3] != ""){
       warning("horizontal")
-      return (board[1,i]);
+      return (board[i,1]);
     }
   }
+  
+  return (FALSE)
 }
 
 
@@ -55,7 +64,25 @@ checkVictory(diagonal2)
 
 tie = matrix(c("x","O","X","O","X","O","O","X","O"), nrow = 3, ncol = 3)
 checkVictory(tie)
-  
+
+TestCheckVictory6 = matrix(c("O","","","","X","","","","X"), nrow = 3, ncol = 3)
+checkVictory(TestCheckVictory6)
+
+TestCheckVictory7 = matrix(c("","","","","X","","","",""), nrow = 3, ncol = 3)
+checkVictory(TestCheckVictory7)
+
+TestCheckVictory8 = matrix(c("X","O","","O","X","","X","",""), nrow = 3, ncol = 3)
+checkVictory(TestCheckVictory8)
+
+TestCheckVictory9 = matrix(c("","","","X","","","","",""), nrow = 3, ncol = 3)
+checkVictory(TestCheckVictory9)
+
+TestCheckVictory10 = matrix(c("O","","X","X","O","X","O","","X"), nrow = 3, ncol = 3)
+checkVictory(TestCheckVictory10)
+
+TestCheckVictory11 = matrix(c("O","O","X","O","X","X","","","X"), nrow = 3, ncol = 3)
+checkVictory(TestCheckVictory11)
+
 
 drawBoard = function(board){
   
@@ -78,19 +105,19 @@ drawBoard = function(board){
   text(1,-.73,labels=ifelse(board[3,2]==""," ",board[3,2]),cex=7)
   text(1.257,-.73,labels=ifelse(board[3,3]==""," ",board[3,3]),cex=7)
 }
-  
+
 TestDrawBoard = matrix(c("","O","X","O","","O","","O","O"), nrow = 3, ncol = 3)
 drawBoard(TestDrawBoard)
 
 
 boardMatrixToArray = function (board){
-
+  
   array = as.vector(t(board))
- 
+  
   for (i in 1:9) {
     if(array[i] == ""){
       array[i] = "."
-      }
+    }
     if(array[i] == "O"){
       array[i] = "B"
     }
@@ -120,15 +147,59 @@ TestModelotttViewToboardMatrix = c(".", "B", ".", "B", ".", "B", "X", "B", "B")
 modelotttViewToboardMatrix(TestModelotttViewToboardMatrix)
 
 isAValidPlay = function(board, play){
-  if(boardMatrixToArray(board)[play] == "."){
+  if(is.null(play) || play == ""){
+    return (FALSE)
+  }
+  if(board[play[1],play[2]] == ""){
     return (TRUE)
   }
   return (FALSE)
 }
 
 TestIsAValidPlay = matrix(c("","O","X","O","","O","","O","O"), nrow = 3, ncol = 3)
-isAValidPlay(TestIsAValidPlay,1)
-isAValidPlay(TestIsAValidPlay,2)
+isAValidPlay(TestIsAValidPlay,c(1,3))
+isAValidPlay(TestIsAValidPlay,c(1,2))
+TestIsAValidPlay2 = matrix(c("","","","","X","","","",""), nrow = 3, ncol = 3)
+isAValidPlay(TestIsAValidPlay2,"")
+
+
+randomPlay = function(board, piece){
+  play = c("","")
+  
+  while(isAValidPlay(board, play) != TRUE){
+    play = c(sample(3,1),sample(3,1))
+  }
+  board[play[1],play[2]] = piece
+  return (board)
+}
+
+TestRandomPlay = matrix(c("","O","O","O","","O","","O","O"), nrow = 3, ncol = 3)
+randomPlay(TestRandomPlay, "X")
+
+numberToMatrixPosition = function(position){
+  if(position == 1)  return(c(1,1))
+  if(position == 2)  return(c(1,2))
+  if(position == 3)  return(c(1,3))
+  
+  if(position == 4)  return(c(2,1))
+  if(position == 5)  return(c(2,2))
+  if(position == 6)  return(c(2,3))
+  
+  if(position == 7)  return(c(3,1))
+  if(position == 8)  return(c(3,2))
+  if(position == 9)  return(c(3,3))
+}
+
+TestNumberToMatrixPosition = 5
+numberToMatrixPosition(TestNumberToMatrixPosition)
+
+
+userPlay <- function() {
+  print("Type '1.1' to '3.3' to choose a position to play")
+  print("Example: 1.2, 1.3, 2.2 ...")
+  userPlay = readline(prompt = "Movement:")
+  userPlayArray = unlist(strsplit(userPlay, "[.]"))
+}
 
 
 startGame = function(){
@@ -169,19 +240,14 @@ startGame = function(){
   drawBoard(board)
   
   if(startPlayer == computer){
-    firstMoveX = sample(3,1)
-    firstMoveY = sample(3,1)
     
-    board[firstMoveX][firstMoveY] = computerPiece
+    board = randomPlay(board, computerPiece)
     
     drawBoard(board)
     turn = user
     
   }else{
-    print("Type '1.1' to '3.3' to choose a position to play")
-    print("Example: 1.2, 1.3, 2.2 ...")
-    playerMovement = readline(prompt = "Movement:")
-    playerMovementArray = unlist(strsplit(playerMovement, "[.]"))
+    playerMovementArray = userPlay()
     board[strtoi(playerMovementArray[1], base = 0L),strtoi(playerMovementArray[2], base = 0L)] = playerPiece
     
     drawBoard(board)
@@ -189,36 +255,48 @@ startGame = function(){
   }
   
   
-  while(checkVictory(board) == ""){
+  while(checkVictory(board) == FALSE){
     if(turn == computer){
       computerPlay =  ""
-      while(isAValidPlay(board,computerPlay)){
       
-        computerPlay = modelottt$Policy[paste(boardMatrixToArray(board),collapse="")]
+      computerPlay = modelottt$Policy[paste(boardMatrixToArray(board),collapse="")]
+     
+      if(is.na(computerPlay)){
+        board = randomPlay(board, computerPiece)
+      }
+      else if(isAValidPlay(board,numberToMatrixPosition(as.integer(substr(computerPlay,2,2))))){
         
+        computerPlay = numberToMatrixPosition(as.integer(substr(computerPlay,2,2)))
+        board[computerPlay[1],computerPlay[2]] = computerPiece
       }
       
       drawBoard(board)
       turn = user
     }
     
+    if (checkVictory(board) == TRUE){
+      break
+    }
+    
     if(turn == user){
+      userPlayArray = ""
       
-      userPlay = ""
-      while(isAValidPlay(board,userPlay)){}
-        print("Type '1.1' to '3.3' to choose a position to play")
-        print("Example: 1.2, 1.3, 2.2 ...")
-        userPlay = readline(prompt = "Movement:")
-        userPlayArray = unlist(strsplit(playerMovement, "[.]"))
-        board[strtoi(playerMovementArray[1], base = 0L),strtoi(userPlayArray[2], base = 0L)] = playerPiece
-    }
-    drawBoard(board)
-    turn = computer
+      while(isAValidPlay(board,userPlayArray) != TRUE){
+        userPlayArray =  userPlay()
+        userPlayArray = c(strtoi(userPlayArray[1], base = 0L),strtoi(userPlayArray[2], base = 0L))
         
-        
+      }
       
+      board[userPlayArray[1],userPlayArray[2]] = playerPiece
+      drawBoard(board)
+      turn = computer
     }
+    
+    if (checkVictory(board) == TRUE){
+      break
+    }
+    
   }
+  drawBoard(board)
   
 }
-

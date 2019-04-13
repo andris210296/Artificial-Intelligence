@@ -9,6 +9,7 @@ control <- list(alpha = 0.2, gamma = 0.4, epsilon = 0.1)
 modelottt <- ReinforcementLearning(tictactoe, s = "State", a = "Action", r = "Reward",
                                    s_new = "NextState", iter = 2, control = control)
 
+#This method verifies if there is a winner
 checkVictory= function(board)
 {
   #diagonal1
@@ -84,9 +85,8 @@ TestCheckVictory11 = matrix(c("O","O","X","O","X","X","","","X"), nrow = 3, ncol
 checkVictory(TestCheckVictory11)
 
 
+#This method draws the board with the pieces
 drawBoard = function(board){
-  
-  #draws the board with the pieces
   plot(0,type='n',axes=FALSE,ann=FALSE)
   abline(v=.87)
   abline(v=1.14)
@@ -111,9 +111,7 @@ drawBoard(TestDrawBoard)
 
 
 boardMatrixToArray = function (board){
-  
   array = as.vector(t(board))
-  
   for (i in 1:9) {
     if(array[i] == ""){
       array[i] = "."
@@ -122,7 +120,6 @@ boardMatrixToArray = function (board){
       array[i] = "B"
     }
   }
-  
   return (array);
 }
 
@@ -162,7 +159,7 @@ isAValidPlay(TestIsAValidPlay,c(1,2))
 TestIsAValidPlay2 = matrix(c("","","","","X","","","",""), nrow = 3, ncol = 3)
 isAValidPlay(TestIsAValidPlay2,"")
 
-
+#This method creates a random play
 randomPlay = function(board, piece){
   play = c("","")
   
@@ -201,7 +198,7 @@ userPlay <- function() {
   userPlayArray = unlist(strsplit(userPlay, "[.]"))
 }
 
-
+# The game it self
 startGame = function(){
   
   startPlayer = ""
@@ -235,14 +232,11 @@ startGame = function(){
     turn = playerPiece
   }
   
-  
   board = matrix(c(replicate(9,"")), nrow = 3, ncol = 3)
   drawBoard(board)
   
   if(startPlayer == computer){
-    
     board = randomPlay(board, computerPiece)
-    
     drawBoard(board)
     turn = user
     
@@ -254,18 +248,16 @@ startGame = function(){
     turn = computer
   }
   
-  
   while(checkVictory(board) == FALSE){
+    
     if(turn == computer){
       computerPlay =  ""
-      
       computerPlay = modelottt$Policy[paste(boardMatrixToArray(board),collapse="")]
      
       if(is.na(computerPlay)){
         board = randomPlay(board, computerPiece)
       }
       else if(isAValidPlay(board,numberToMatrixPosition(as.integer(substr(computerPlay,2,2))))){
-        
         computerPlay = numberToMatrixPosition(as.integer(substr(computerPlay,2,2)))
         board[computerPlay[1],computerPlay[2]] = computerPiece
       }
@@ -274,7 +266,7 @@ startGame = function(){
       turn = user
     }
     
-    if (checkVictory(board) == TRUE){
+    if (checkVictory(board) != FALSE){
       break
     }
     
@@ -284,19 +276,12 @@ startGame = function(){
       while(isAValidPlay(board,userPlayArray) != TRUE){
         userPlayArray =  userPlay()
         userPlayArray = c(strtoi(userPlayArray[1], base = 0L),strtoi(userPlayArray[2], base = 0L))
-        
       }
       
       board[userPlayArray[1],userPlayArray[2]] = playerPiece
       drawBoard(board)
       turn = computer
     }
-    
-    if (checkVictory(board) == TRUE){
-      break
-    }
-    
   }
   drawBoard(board)
-  
 }
